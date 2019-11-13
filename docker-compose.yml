@@ -7,46 +7,62 @@ services:
     image: nginx:alpine
     restart: always
     ports:
-      - 8080:80
+      - 80:80
     volumes:
       - public_html:/public_html
       - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/log:/var/log/nginx
-  php55:
-    container_name: webserver_php55 # port default dari php fpm adalah 9000. tidak perlu diexpose
-    image: php:5.5-fpm-alpine
-    restart: always
-    depends_on:
-      - webserver
-    volumes:
-      - public_html:/public_html # php fpm juga harus mount folder public html yang sama dengan webserver seperti nginx
-      # - ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf lokasi konfigurasi php fpm. unkomen jika diperlukan
-  php56:
-    container_name: webserver_php56 # port default dari php fpm adalah 9000. tidak perlu diexpose
-    image: php:5.6-fpm-alpine
-    restart: always
-    depends_on:
-      - webserver
-    volumes:
-      - public_html:/public_html # php fpm juga harus mount folder public html yang sama dengan webserver seperti nginx
-      # - ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf lokasi konfigurasi php fpm. unkomen jika diperlukan
   php71:
     container_name: webserver_php71 # port default dari php fpm adalah 9000. tidak perlu diexpose
     image: php:7.1-fpm-alpine
     restart: always
+    build: 
+      context: ./ 
+      dockerfile: Dockerfile.php71
     depends_on:
       - webserver
     volumes:
       - public_html:/public_html # php fpm juga harus mount folder public html yang sama dengan webserver seperti nginx
+      #~ - ./php:/usr/local/etc/php
       # - ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf lokasi konfigurasi php fpm. unkomen jika diperlukan
   php72:
     container_name: webserver_php72 # port default dari php fpm adalah 9000. tidak perlu diexpose
     image: php:7.2-fpm-alpine
     restart: always
+    build: 
+      context: ./ 
+      dockerfile: Dockerfile.php72
     depends_on:
       - webserver
     volumes:
       - public_html:/public_html # php fpm juga harus mount folder public html yang sama dengan webserver seperti nginx
+      #~ - ./php:/usr/local/etc/php
+      # - ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf lokasi konfigurasi php fpm. unkomen jika diperlukan
+  php55:
+    container_name: webserver_php55 # port default dari php fpm adalah 9000. tidak perlu diexpose
+    image: php:5.5-fpm-alpine
+    restart: always
+    build: 
+      context: ./
+      dockerfile: Dockerfile.php55
+    depends_on:
+      - webserver
+    volumes:
+      - public_html:/public_html # php fpm juga harus mount folder public html yang sama dengan webserver seperti nginx
+      #~ - ./php:/usr/local/etc/php
+      # - ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf lokasi konfigurasi php fpm. unkomen jika diperlukan
+  php56:
+    container_name: webserver_php56 # port default dari php fpm adalah 9000. tidak perlu diexpose
+    image: php:5.6-fpm-alpine
+    restart: always
+    build: 
+      context: ./
+      dockerfile: Dockerfile.php56
+    depends_on:
+      - webserver
+    volumes:
+      - public_html:/public_html # php fpm juga harus mount folder public html yang sama dengan webserver seperti nginx
+      #~ - ./php:/usr/local/etc/php
       # - ./php/www.conf:/usr/local/etc/php-fpm.d/www.conf lokasi konfigurasi php fpm. unkomen jika diperlukan
   db:
     container_name: webserver_mariadb
@@ -56,6 +72,8 @@ services:
       MYSQL_ROOT_PASSWORD: mysql
     ports:
       - 3306:3306
+    volumes:
+      - db_data:/var/lib/mysql
   adminer:
     container_name: webserver_adminer
     image: adminer
@@ -70,4 +88,10 @@ volumes:
     driver_opts:
       type: none
       device: ${PWD}/public_html # ${pwd} = lokasi folder sekarang
+      o: bind
+  db_data: # folder tempat isi file database dimasukkan
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/mysql # ${pwd} = lokasi folder sekarang
       o: bind
