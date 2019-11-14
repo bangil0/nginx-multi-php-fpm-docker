@@ -3,7 +3,7 @@
 1. PHP-FPM 5.5
 1. PHP-FPM 5.6
 1. PHP-FPM 7.1
-1. PHP-FPM 7.1
+1. PHP-FPM 7.2
 1. Mariadb (database)
 
 # Penjelasan isi file 
